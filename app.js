@@ -5,6 +5,8 @@ const {
 	withdraw,
 	validationMoney,
 	transferMoney,
+	getUser,
+	getUsers,
 } = require("./utils");
 
 const express = require("express");
@@ -66,6 +68,22 @@ app.put("/api/transferMoney/:id", (req, res) => {
 		validationMoney(req.body);
 		transferMoney(req.params.id, req.body);
 		res.status(201).send("transfer money succeed");
+	} catch (e) {
+		res.status(400).send({ error: e.message });
+	}
+});
+app.get("/api/user/:id", (req, res) => {
+	try {
+		const userInfo = getUser(req.params.id);
+		res.status(200).send(userInfo);
+	} catch (e) {
+		res.status(400).send({ error: e.message });
+	}
+});
+
+app.get("/api/users", (req, res) => {
+	try {
+		res.status(200).send(getUsers());
 	} catch (e) {
 		res.status(400).send({ error: e.message });
 	}

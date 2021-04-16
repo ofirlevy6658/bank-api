@@ -21,11 +21,11 @@ function deposit(id, { amount }) {
 	saveUser(users);
 }
 
-function updateCredit(id, { credit }) {
+function updateCredit(id, { amount }) {
 	const users = loadUsers();
 	const user = users.find((el) => el.id === id);
 	if (!user) throw new Error("User not found");
-	const newCredit = parseInt(user.credit) + parseInt(credit);
+	const newCredit = parseInt(user.credit) + parseInt(amount);
 	user.credit = newCredit;
 	saveUser(users);
 }
@@ -34,11 +34,14 @@ function withdraw(id, { amount }) {
 	const users = loadUsers();
 	const user = users.find((el) => el.id === id);
 	if (!user) throw new Error("User not found");
-	const newCash = parseInt(user.cash) - parseInt(amount);
-	const currentCash = parseInt(user.cash) + parseInt(user.credit);
-	if (amount > currentCash)
-		throw new Error(`withdraw rejected, your balance is ${currentCash}$`);
-	user.cash = newCash;
+	// const newCash = parseInt(user.cash) - parseInt(amount);
+	// const currentCash = parseInt(user.cash) + parseInt(user.credit);
+	if (!isPossibleWithdraw(user, amount))
+		throw new Error(`withdraw rejected, not enough money`);
+	// if (amount > currentCash)
+	// user.cash = newCash;
+	user.cash = parseInt(user.cash) - parseInt(amount);
+	console.log(user.cash);
 	saveUser(users);
 }
 
@@ -56,11 +59,23 @@ function transferMoney(senderID, { amount, id }) {
 }
 
 function isPossibleWithdraw(user, amount) {
+	console.log(user.cash);
+	console.log(amount);
 	const userCurrentMoney = parseInt(user.cash) + parseInt(user.credit);
 	if (userCurrentMoney >= parseInt(amount)) {
 		return true;
 	}
 	return false;
+}
+function getUser(id) {
+	const users = loadUsers();
+	const user = users.find((el) => el.id === id);
+	if (!user) throw new Error("User not found");
+	return user;
+}
+function getUsers() {
+	const users = loadUsers();
+	return users;
 }
 
 function validationMoney({ amount }) {
@@ -89,4 +104,6 @@ module.exports = {
 	withdraw,
 	validationMoney,
 	transferMoney,
+	getUser,
+	getUsers,
 };
