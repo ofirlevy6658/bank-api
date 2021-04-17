@@ -1,17 +1,4 @@
-const {
-	addUser,
-	deposit,
-	updateCredit,
-	withdraw,
-	validationMoney,
-	transferMoney,
-	getUser,
-	getUsers,
-	filterByMoney,
-	deactivate,
-	active,
-	getActiveUsers,
-} = require("./utils");
+const utils = require("./utils");
 
 const express = require("express");
 const app = express();
@@ -19,9 +6,8 @@ const app = express();
 app.use(express.json());
 
 app.post("/api/user", (req, res) => {
-	console.log(req.body);
 	try {
-		addUser(req.body);
+		utils.addUser(req.body);
 		res.status(201).send("User added");
 	} catch (e) {
 		res.status(400).send({ error: e.message });
@@ -30,8 +16,7 @@ app.post("/api/user", (req, res) => {
 
 app.put("/api/deposit/:id", (req, res) => {
 	try {
-		validationMoney(req.body);
-		deposit(req.params.id, req.body);
+		utils.deposit(req.params.id, req.body);
 		res.status(201).send("user cash update");
 	} catch (e) {
 		res.status(400).send({ error: e.message });
@@ -40,8 +25,7 @@ app.put("/api/deposit/:id", (req, res) => {
 
 app.put("/api/credit/:id", (req, res) => {
 	try {
-		validationMoney(req.body);
-		updateCredit(req.params.id, req.body);
+		utils.updateCredit(req.params.id, req.body);
 		res.status(201).send("user credit update");
 	} catch (e) {
 		res.status(400).send({ error: e.message });
@@ -50,8 +34,7 @@ app.put("/api/credit/:id", (req, res) => {
 
 app.put("/api/withdraw/:id", (req, res) => {
 	try {
-		validationMoney(req.body);
-		withdraw(req.params.id, req.body);
+		utils.withdraw(req.params.id, req.body);
 		res.status(201).send("withdraw succeed");
 	} catch (e) {
 		res.status(400).send({ error: e.message });
@@ -59,10 +42,8 @@ app.put("/api/withdraw/:id", (req, res) => {
 });
 
 app.put("/api/transferMoney/:id", (req, res) => {
-	console.log("test");
 	try {
-		validationMoney(req.body);
-		transferMoney(req.params.id, req.body);
+		utils.transferMoney(req.params.id, req.body);
 		res.status(201).send("transfer money succeed");
 	} catch (e) {
 		res.status(400).send({ error: e.message });
@@ -70,7 +51,7 @@ app.put("/api/transferMoney/:id", (req, res) => {
 });
 app.get("/api/user/:id", (req, res) => {
 	try {
-		const userInfo = getUser(req.params.id);
+		const userInfo = utils.getUser(req.params.id);
 		res.status(200).send(userInfo);
 	} catch (e) {
 		res.status(400).send({ error: e.message });
@@ -79,7 +60,7 @@ app.get("/api/user/:id", (req, res) => {
 
 app.get("/api/users", (req, res) => {
 	try {
-		res.status(200).send(getUsers());
+		res.status(200).send(utils.getUsers());
 	} catch (e) {
 		res.status(400).send({ error: e.message });
 	}
@@ -87,8 +68,7 @@ app.get("/api/users", (req, res) => {
 
 app.get("/api/users/filter/amount", (req, res) => {
 	try {
-		validationMoney(req.body);
-		const users = filterByMoney(req.body);
+		const users = utils.filterByMoney(req.body);
 		res.status(200).send(users);
 	} catch (e) {
 		res.status(400).send({ error: e.message });
@@ -96,7 +76,7 @@ app.get("/api/users/filter/amount", (req, res) => {
 });
 app.put("/api/deactivate/:id", (req, res) => {
 	try {
-		deactivate(req.params.id);
+		utils.deactivate(req.params.id);
 		res.status(200).send("User has been disabled");
 	} catch (e) {
 		res.status(400).send({ error: e.message });
@@ -104,7 +84,7 @@ app.put("/api/deactivate/:id", (req, res) => {
 });
 app.put("/api/active/:id", (req, res) => {
 	try {
-		active(req.params.id);
+		utils.active(req.params.id);
 		res.status(200).send("User back to active");
 	} catch (e) {
 		res.status(400).send({ error: e.message });
@@ -112,7 +92,7 @@ app.put("/api/active/:id", (req, res) => {
 });
 app.get("/api/activeUsers", (req, res) => {
 	try {
-		res.status(200).send(getActiveUsers());
+		res.status(200).send(utils.getActiveUsers());
 	} catch (e) {
 		res.status(400).send({ error: e.message });
 	}

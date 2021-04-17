@@ -1,6 +1,5 @@
 const { v4: uuidv4 } = require("uuid"); // generate uniqe id
 const fs = require("fs");
-const { send } = require("process");
 
 function addUser({ cash = 0, credit = 0 }) {
 	// deafult value of 0 if not provided
@@ -13,6 +12,8 @@ function addUser({ cash = 0, credit = 0 }) {
 }
 
 function deposit(id, { amount }) {
+	console.log(amount);
+	validationMoney(amount);
 	const users = loadUsers();
 	const user = users.find((el) => el.id === id);
 	checkUser(user);
@@ -22,6 +23,7 @@ function deposit(id, { amount }) {
 }
 
 function updateCredit(id, { amount }) {
+	validationMoney(amount);
 	const users = loadUsers();
 	const user = users.find((el) => el.id === id);
 	checkUser(user);
@@ -31,6 +33,7 @@ function updateCredit(id, { amount }) {
 }
 
 function withdraw(id, { amount }) {
+	validationMoney(amount);
 	const users = loadUsers();
 	const user = users.find((el) => el.id === id);
 	checkUser(user);
@@ -42,6 +45,7 @@ function withdraw(id, { amount }) {
 }
 
 function transferMoney(senderID, { amount, id }) {
+	validationMoney(amount);
 	const users = loadUsers();
 	const reciver = users.find((el) => el.id === id);
 	const sender = users.find((el) => el.id === senderID);
@@ -73,6 +77,7 @@ function getUsers() {
 	return users;
 }
 function filterByMoney({ amount }) {
+	validationMoney(amount);
 	const users = loadUsers();
 	const filterUsers = users.filter((el) => el.cash >= amount);
 	return filterUsers;
@@ -100,7 +105,7 @@ function getActiveUsers() {
 	return activeUsers;
 }
 
-function validationMoney({ amount }) {
+function validationMoney(amount) {
 	if (!amount) throw new Error("parameter amount not provided");
 	if (amount < 1) throw new Error("parameter must be positive");
 }
