@@ -1,18 +1,33 @@
-const { v4: uuidv4 } = require("uuid"); // generate uniqe id
 const fs = require("fs");
+const User = require("./models/user");
+const Account = require("./models/account");
 
-function addUser({ cash = 0, credit = 0 }) {
-	// deafult value of 0 if not provided
-	if (cash > 999999 || cash < 0 || credit > 5000 || credit < 0)
-		throw new Error("bad parameters");
-	const user = { cash, credit, id: uuidv4(), isActive: true };
-	const users = loadUsers();
-	users.push(user);
-	saveUser(users);
+async function addUser({ name, mobile, email }) {
+	try {
+		const user = new User({
+			name,
+			mobile,
+			email,
+		});
+		await user.save();
+		createBankAccount(user._id);
+	} catch (e) {
+		throw new Error(e);
+	}
+}
+
+async function createBankAccount(ownerId) {
+	try {
+		const account = new Account({
+			ownerId,
+		});
+		await account.save();
+	} catch (e) {
+		throw new Error(e);
+	}
 }
 
 function deposit(id, { amount }) {
-	console.log(amount);
 	validationMoney(amount);
 	const users = loadUsers();
 	const user = users.find((el) => el.id === id);

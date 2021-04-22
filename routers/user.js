@@ -1,20 +1,17 @@
-const utils = require("./utils");
-
 const express = require("express");
-const app = express();
+const router = new express.Router();
+const utils = require("../utils");
 
-app.use(express.json());
-
-app.post("/api/user", (req, res) => {
+router.post("/api/user", async (req, res) => {
 	try {
-		utils.addUser(req.body);
+		await utils.addUser(req.body);
 		res.status(201).send("User added");
 	} catch (e) {
 		res.status(400).send({ error: e.message });
 	}
 });
 
-app.put("/api/deposit/:id", (req, res) => {
+router.put("/api/deposit/:id", (req, res) => {
 	try {
 		utils.deposit(req.params.id, req.body);
 		res.status(201).send("user cash update");
@@ -23,7 +20,7 @@ app.put("/api/deposit/:id", (req, res) => {
 	}
 });
 
-app.put("/api/credit/:id", (req, res) => {
+router.put("/api/credit/:id", (req, res) => {
 	try {
 		utils.updateCredit(req.params.id, req.body);
 		res.status(201).send("user credit update");
@@ -32,7 +29,7 @@ app.put("/api/credit/:id", (req, res) => {
 	}
 });
 
-app.put("/api/withdraw/:id", (req, res) => {
+router.put("/api/withdraw/:id", (req, res) => {
 	try {
 		utils.withdraw(req.params.id, req.body);
 		res.status(201).send("withdraw succeed");
@@ -41,7 +38,7 @@ app.put("/api/withdraw/:id", (req, res) => {
 	}
 });
 
-app.put("/api/transferMoney/:id", (req, res) => {
+router.put("/api/transferMoney/:id", (req, res) => {
 	try {
 		utils.transferMoney(req.params.id, req.body);
 		res.status(201).send("transfer money succeed");
@@ -49,7 +46,7 @@ app.put("/api/transferMoney/:id", (req, res) => {
 		res.status(400).send({ error: e.message });
 	}
 });
-app.get("/api/user/:id", (req, res) => {
+router.get("/api/user/:id", (req, res) => {
 	try {
 		const userInfo = utils.getUser(req.params.id);
 		res.status(200).send(userInfo);
@@ -58,7 +55,7 @@ app.get("/api/user/:id", (req, res) => {
 	}
 });
 
-app.get("/api/users", (req, res) => {
+router.get("/api/users", (req, res) => {
 	try {
 		res.status(200).send(utils.getUsers());
 	} catch (e) {
@@ -66,7 +63,7 @@ app.get("/api/users", (req, res) => {
 	}
 });
 
-app.get("/api/users/filter/amount", (req, res) => {
+router.get("/api/users/filter/amount", (req, res) => {
 	try {
 		const users = utils.filterByMoney(req.body);
 		res.status(200).send(users);
@@ -74,7 +71,7 @@ app.get("/api/users/filter/amount", (req, res) => {
 		res.status(400).send({ error: e.message });
 	}
 });
-app.put("/api/deactivate/:id", (req, res) => {
+router.put("/api/deactivate/:id", (req, res) => {
 	try {
 		utils.deactivate(req.params.id);
 		res.status(200).send("User has been disabled");
@@ -82,7 +79,7 @@ app.put("/api/deactivate/:id", (req, res) => {
 		res.status(400).send({ error: e.message });
 	}
 });
-app.put("/api/active/:id", (req, res) => {
+router.put("/api/active/:id", (req, res) => {
 	try {
 		utils.active(req.params.id);
 		res.status(200).send("User back to active");
@@ -90,15 +87,11 @@ app.put("/api/active/:id", (req, res) => {
 		res.status(400).send({ error: e.message });
 	}
 });
-app.get("/api/activeUsers", (req, res) => {
+router.get("/api/activeUsers", (req, res) => {
 	try {
 		res.status(200).send(utils.getActiveUsers());
 	} catch (e) {
 		res.status(400).send({ error: e.message });
 	}
 });
-
-const PORT = 3000;
-app.listen(PORT, () => {
-	console.log("listening on port 3000");
-});
+module.exports = router;
