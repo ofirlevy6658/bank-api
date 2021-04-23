@@ -1,13 +1,14 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 
-const User = mongoose.model("Client", {
+const User = mongoose.model("Clients", {
 	name: {
 		type: String,
 		required: true,
 		minlength: 3,
 		maxlength: 13,
 	},
+
 	mobile: {
 		type: String,
 		required: true,

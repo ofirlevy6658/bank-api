@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const Account = mongoose.model("Client", {
+const Account = mongoose.model("accounts", {
 	cash: {
 		type: Number,
 		required: true,
@@ -14,6 +14,7 @@ const Account = mongoose.model("Client", {
 	ownerId: {
 		type: String,
 		required: true,
+		unique: true,
 	},
 });
 module.exports = Account;

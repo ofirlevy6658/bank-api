@@ -1,8 +1,12 @@
 const fs = require("fs");
 const User = require("./models/user");
 const Account = require("./models/account");
+const AccountLog = require("./models/transition");
+const { findById, findByIdAndUpdate } = require("./models/user");
 
 async function addUser({ name, mobile, email }) {
+	if (!name || !mobile || !email)
+		throw new Error("parameters name ,mobile and email must be provide");
 	try {
 		const user = new User({
 			name,
@@ -21,139 +25,156 @@ async function createBankAccount(ownerId) {
 		const account = new Account({
 			ownerId,
 		});
+		const logAccount = new AccountLog({
+			ownerId,
+			log: `open on account ${new Date().toLocaleString()}`,
+		});
 		await account.save();
+		await logAccount.save();
 	} catch (e) {
 		throw new Error(e);
 	}
 }
 
-function deposit(id, { amount }) {
+async function deposit(id, { amount }) {
 	validationMoney(amount);
-	const users = loadUsers();
-	const user = users.find((el) => el.id === id);
-	checkUser(user);
-	const newCash = parseInt(user.cash) + parseInt(amount);
-	user.cash = newCash;
-	saveUser(users);
-}
-
-function updateCredit(id, { amount }) {
-	validationMoney(amount);
-	const users = loadUsers();
-	const user = users.find((el) => el.id === id);
-	checkUser(user);
-	const newCredit = parseInt(user.credit) + parseInt(amount);
-	user.credit = newCredit;
-	saveUser(users);
-}
-
-function withdraw(id, { amount }) {
-	validationMoney(amount);
-	const users = loadUsers();
-	const user = users.find((el) => el.id === id);
-	checkUser(user);
-	if (!isPossibleWithdraw(user, amount))
-		throw new Error(`withdraw rejected, not enough money`);
-	user.cash = parseInt(user.cash) - parseInt(amount);
-	console.log(user.cash);
-	saveUser(users);
-}
-
-function transferMoney(senderID, { amount, id }) {
-	validationMoney(amount);
-	const users = loadUsers();
-	const reciver = users.find((el) => el.id === id);
-	const sender = users.find((el) => el.id === senderID);
-	checkUser(reciver);
-	checkUser(sender);
-	if (reciver === sender) throw new Error("sender and reciver are the same");
-	if (!isPossibleWithdraw(sender, amount))
-		throw new Error(`transfer money rejected not enough money in the account`);
-	sender.cash = parseInt(sender.cash) - parseInt(amount);
-	reciver.cash = parseInt(reciver.cash) + parseInt(amount);
-	saveUser(users);
-}
-
-function isPossibleWithdraw(user, amount) {
-	const userCurrentMoney = parseInt(user.cash) + parseInt(user.credit);
-	if (userCurrentMoney >= parseInt(amount)) {
-		return true;
+	try {
+		if (!(await User.findById(id))) throw new Error("User not found");
+		await Account.findOneAndUpdate({ ownerId: id }, { $inc: { cash: amount } });
+		await AccountLog.findOneAndUpdate(
+			{ ownerId: id },
+			{ $push: { log: `deposit ${amount}` } }
+		);
+	} catch (e) {
+		throw new Error("User not found");
 	}
-	return false;
 }
-function getUser(id) {
-	const users = loadUsers();
-	const user = users.find((el) => el.id === id);
-	if (!user) throw new Error("User not found");
-	return user;
+
+async function updateCredit(id, { amount }) {
+	validationMoney(amount);
+	try {
+		if (!(await User.findById(id))) throw new Error("User not found");
+		await Account.findOneAndUpdate(
+			{ ownerId: id },
+			{ $inc: { credit: amount } }
+		);
+		await AccountLog.findOneAndUpdate(
+			{ ownerId: id },
+			{ $push: { log: `credit increase by ${amount}` } }
+		);
+	} catch (e) {
+		throw new Error(e);
+	}
 }
-function getUsers() {
-	const users = loadUsers();
-	return users;
+
+async function withdraw(id, { amount }) {
+	validationMoney(amount);
+	try {
+		if (!(await User.findById(id))) throw new Error("User not found");
+		const account = await Account.findOne({ ownerId: id });
+		if (account.cash - amount >= -account.credit) {
+			await Account.findOneAndUpdate(
+				{ ownerId: id },
+				{ $inc: { cash: -amount } }
+			);
+		} else {
+			throw new Error("Rejected not enough credit");
+		}
+	} catch (e) {
+		throw new Error(e);
+	}
 }
+
+async function transferMoney(senderID, { amount, reciverID }) {
+	validationMoney(amount);
+	try {
+		const sender = await Account.findOne({ ownerId: senderID });
+		amount = parseInt(amount);
+		if (!(sender.cash + sender.credit >= amount))
+			throw new Error("Rejected not enough credit");
+		else {
+			Account.findByIdAndUpdate(
+				{ ownerId: senderID },
+				{
+					$inc: {
+						cash: -amount,
+					},
+				}
+			);
+			Account.findByIdAndUpdate(
+				{ ownerId: reciverID },
+				{
+					$inc: {
+						cash: amount,
+					},
+				}
+			);
+		}
+	} catch (e) {
+		throw new Error(e);
+	}
+}
+
+function getUser(id) {}
+
 function filterByMoney({ amount }) {
 	validationMoney(amount);
 	const users = loadUsers();
 	const filterUsers = users.filter((el) => el.cash >= amount);
 	return filterUsers;
 }
-function deactivate(id) {
-	const users = loadUsers();
-	const user = users.find((el) => el.id === id);
-	if (!user) throw new Error("User not found");
-	if (!user.isActive) throw new Error("User already deactivate");
-	else user.isActive = false;
-	saveUser(users);
-}
+// function deactivate(id) {
+// 	const users = loadUsers();
+// 	const user = users.find((el) => el.id === id);
+// 	if (!user) throw new Error("User not found");
+// 	if (!user.isActive) throw new Error("User already deactivate");
+// 	else user.isActive = false;
+// 	saveUser(users);
+// }
 
-function active(id) {
-	const users = loadUsers();
-	const user = users.find((el) => el.id === id);
-	if (!user) throw new Error("User not found");
-	if (user.isActive) throw new Error("User already active");
-	else user.isActive = true;
-	saveUser(users);
-}
-function getActiveUsers() {
-	const users = loadUsers();
-	const activeUsers = users.filter((el) => el.isActive);
-	return activeUsers;
-}
+// function active(id) {
+// 	const users = loadUsers();
+// 	const user = users.find((el) => el.id === id);
+// 	if (!user) throw new Error("User not found");
+// 	if (user.isActive) throw new Error("User already active");
+// 	else user.isActive = true;
+// 	saveUser(users);
+// }
+// function getActiveUsers() {
+// 	const users = loadUsers();
+// 	const activeUsers = users.filter((el) => el.isActive);
+// 	return activeUsers;
+// }
 
 function validationMoney(amount) {
 	if (!amount) throw new Error("parameter amount not provided");
 	if (amount < 1) throw new Error("parameter must be positive");
 }
-function checkUser(user) {
-	if (!user) throw new Error("User not found");
-	if (!user.isActive) throw new Error("User is not active");
-}
+// function checkUser(user) {
+// 	if (!user) throw new Error("User not found");
+// 	if (!user.isActive) throw new Error("User is not active");
+// }
 
-function saveUser(user) {
-	fs.writeFileSync("./database/users.json", JSON.stringify(user));
-}
+// function saveUser(user) {
+// 	fs.writeFileSync("./database/users.json", JSON.stringify(user));
+// }
 
-function loadUsers() {
-	try {
-		const dataBuffer = fs.readFileSync("./database/users.json");
-		const dataJSON = dataBuffer.toString();
-		return JSON.parse(dataJSON);
-	} catch (e) {
-		return [];
-	}
-}
+// function loadUsers() {
+// 	try {
+// 		const dataBuffer = fs.readFileSync("./database/users.json");
+// 		const dataJSON = dataBuffer.toString();
+// 		return JSON.parse(dataJSON);
+// 	} catch (e) {
+// 		return [];
+// 	}
+// }
 
 module.exports = {
 	addUser,
 	deposit,
 	updateCredit,
 	withdraw,
-	validationMoney,
 	transferMoney,
 	getUser,
-	getUsers,
 	filterByMoney,
-	deactivate,
-	active,
-	getActiveUsers,
 };

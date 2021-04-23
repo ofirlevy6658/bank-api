@@ -11,36 +11,36 @@ router.post("/api/user", async (req, res) => {
 	}
 });
 
-router.put("/api/deposit/:id", (req, res) => {
+router.put("/api/deposit/:id", async (req, res) => {
 	try {
-		utils.deposit(req.params.id, req.body);
+		await utils.deposit(req.params.id, req.body);
 		res.status(201).send("user cash update");
 	} catch (e) {
 		res.status(400).send({ error: e.message });
 	}
 });
 
-router.put("/api/credit/:id", (req, res) => {
+router.put("/api/credit/:id", async (req, res) => {
 	try {
-		utils.updateCredit(req.params.id, req.body);
+		await utils.updateCredit(req.params.id, req.body);
 		res.status(201).send("user credit update");
 	} catch (e) {
 		res.status(400).send({ error: e.message });
 	}
 });
 
-router.put("/api/withdraw/:id", (req, res) => {
+router.put("/api/withdraw/:id", async (req, res) => {
 	try {
-		utils.withdraw(req.params.id, req.body);
+		await utils.withdraw(req.params.id, req.body);
 		res.status(201).send("withdraw succeed");
 	} catch (e) {
 		res.status(400).send({ error: e.message });
 	}
 });
 
-router.put("/api/transferMoney/:id", (req, res) => {
+router.put("/api/transferMoney/:id", async (req, res) => {
 	try {
-		utils.transferMoney(req.params.id, req.body);
+		await utils.transferMoney(req.params.id, req.body);
 		res.status(201).send("transfer money succeed");
 	} catch (e) {
 		res.status(400).send({ error: e.message });
