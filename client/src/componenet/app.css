@@ -1,0 +1,23 @@
+h1 {
+	text-align: center;
+}
+.clients {
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
+}
+
+.client {
+	border: solid 3px;
+}
+span {
+	color: black;
+	font-size: 22px;
+	margin: 30px;
+}
+
+.user-data {
+	display: flex;
+	flex-direction: column;
+	word-spacing: 30px;
+}

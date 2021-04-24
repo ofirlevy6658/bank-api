@@ -26,7 +26,7 @@ async function createBankAccount(ownerId) {
 		});
 		const logAccount = new AccountLog({
 			ownerId,
-			log: `open on account ${new Date().toLocaleString()}`,
+			log: `Open on account ${new Date().toLocaleString()}`,
 		});
 		await account.save();
 		await logAccount.save();
@@ -121,6 +121,18 @@ async function getUsers() {
 		throw new Error(e);
 	}
 }
+async function getUser(id) {
+	try {
+		const userData = [];
+		userData.push(await User.findById(id));
+		userData.push(await Account.findOne({ ownerId: id }));
+		userData.push(await AccountLog.findOne({ ownerId: id }));
+
+		return userData;
+	} catch (e) {
+		throw new Error(e);
+	}
+}
 
 function validationMoney(amount) {
 	if (!amount) throw new Error("parameter amount not provided");
@@ -134,4 +146,5 @@ module.exports = {
 	withdraw,
 	transferMoney,
 	getUsers,
+	getUser,
 };

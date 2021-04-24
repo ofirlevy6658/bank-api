@@ -1,11 +1,15 @@
 const express = require("express");
-const app = express();
 const userRouter = require("./routers/user");
+const cors = require("cors");
 require("./db/mongoose");
+
+const app = express();
+app.use(cors());
+
 app.use(express.json());
 app.use(userRouter);
 
-const PORT = 3000;
+const PORT = 4000;
 app.listen(PORT, () => {
-	console.log("listening on port 3000");
+	console.log(`listening on port ${PORT}`);
 });
