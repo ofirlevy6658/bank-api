@@ -1,4 +1,3 @@
-const fs = require("fs");
 const User = require("./models/user");
 const Account = require("./models/account");
 const AccountLog = require("./models/transition");
@@ -93,7 +92,7 @@ async function transferMoney(senderID, { amount, reciverID }) {
 		if (!(sender.cash + sender.credit >= amount))
 			throw new Error("Rejected not enough credit");
 		else {
-			Account.findByIdAndUpdate(
+			await Account.findOneAndUpdate(
 				{ ownerId: senderID },
 				{
 					$inc: {
@@ -101,7 +100,7 @@ async function transferMoney(senderID, { amount, reciverID }) {
 					},
 				}
 			);
-			Account.findByIdAndUpdate(
+			await Account.findOneAndUpdate(
 				{ ownerId: reciverID },
 				{
 					$inc: {
@@ -115,59 +114,18 @@ async function transferMoney(senderID, { amount, reciverID }) {
 	}
 }
 
-function getUser(id) {}
-
-function filterByMoney({ amount }) {
-	validationMoney(amount);
-	const users = loadUsers();
-	const filterUsers = users.filter((el) => el.cash >= amount);
-	return filterUsers;
+async function getUsers() {
+	try {
+		return await User.find({});
+	} catch (e) {
+		throw new Error(e);
+	}
 }
-// function deactivate(id) {
-// 	const users = loadUsers();
-// 	const user = users.find((el) => el.id === id);
-// 	if (!user) throw new Error("User not found");
-// 	if (!user.isActive) throw new Error("User already deactivate");
-// 	else user.isActive = false;
-// 	saveUser(users);
-// }
-
-// function active(id) {
-// 	const users = loadUsers();
-// 	const user = users.find((el) => el.id === id);
-// 	if (!user) throw new Error("User not found");
-// 	if (user.isActive) throw new Error("User already active");
-// 	else user.isActive = true;
-// 	saveUser(users);
-// }
-// function getActiveUsers() {
-// 	const users = loadUsers();
-// 	const activeUsers = users.filter((el) => el.isActive);
-// 	return activeUsers;
-// }
 
 function validationMoney(amount) {
 	if (!amount) throw new Error("parameter amount not provided");
 	if (amount < 1) throw new Error("parameter must be positive");
 }
-// function checkUser(user) {
-// 	if (!user) throw new Error("User not found");
-// 	if (!user.isActive) throw new Error("User is not active");
-// }
-
-// function saveUser(user) {
-// 	fs.writeFileSync("./database/users.json", JSON.stringify(user));
-// }
-
-// function loadUsers() {
-// 	try {
-// 		const dataBuffer = fs.readFileSync("./database/users.json");
-// 		const dataJSON = dataBuffer.toString();
-// 		return JSON.parse(dataJSON);
-// 	} catch (e) {
-// 		return [];
-// 	}
-// }
 
 module.exports = {
 	addUser,
@@ -175,6 +133,5 @@ module.exports = {
 	updateCredit,
 	withdraw,
 	transferMoney,
-	getUser,
-	filterByMoney,
+	getUsers,
 };

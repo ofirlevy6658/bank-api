@@ -46,52 +46,21 @@ router.put("/api/transferMoney/:id", async (req, res) => {
 		res.status(400).send({ error: e.message });
 	}
 });
-router.get("/api/user/:id", (req, res) => {
+
+router.get("/api/user/:id", async (req, res) => {
 	try {
-		const userInfo = utils.getUser(req.params.id);
-		res.status(200).send(userInfo);
+		res.status(200).send(await utils.getUser(req.params.id));
 	} catch (e) {
 		res.status(400).send({ error: e.message });
 	}
 });
 
-router.get("/api/users", (req, res) => {
+router.get("/api/users", async (req, res) => {
 	try {
-		res.status(200).send(utils.getUsers());
+		res.status(200).send(await utils.getUsers());
 	} catch (e) {
 		res.status(400).send({ error: e.message });
 	}
 });
 
-router.get("/api/users/filter/amount", (req, res) => {
-	try {
-		const users = utils.filterByMoney(req.body);
-		res.status(200).send(users);
-	} catch (e) {
-		res.status(400).send({ error: e.message });
-	}
-});
-router.put("/api/deactivate/:id", (req, res) => {
-	try {
-		utils.deactivate(req.params.id);
-		res.status(200).send("User has been disabled");
-	} catch (e) {
-		res.status(400).send({ error: e.message });
-	}
-});
-router.put("/api/active/:id", (req, res) => {
-	try {
-		utils.active(req.params.id);
-		res.status(200).send("User back to active");
-	} catch (e) {
-		res.status(400).send({ error: e.message });
-	}
-});
-router.get("/api/activeUsers", (req, res) => {
-	try {
-		res.status(200).send(utils.getActiveUsers());
-	} catch (e) {
-		res.status(400).send({ error: e.message });
-	}
-});
 module.exports = router;
