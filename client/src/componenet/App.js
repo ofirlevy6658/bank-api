@@ -2,9 +2,11 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { BrowserRouter, Route, Switch, Link } from "react-router-dom";
 
+import Nav from "./Nav";
 import Transactions from "./Transactions";
-
+import User from "./User";
 import "./app.css";
+
 const App = () => {
 	const [clients, setClients] = useState([]);
 	useEffect(() => {
@@ -31,12 +33,14 @@ const App = () => {
 	return (
 		<>
 			<BrowserRouter>
+				<Nav />
 				<Switch>
 					<Route exact path="/">
 						<h1>Bank Clients</h1>
 						<div className="clients">{renderClients}</div>
 					</Route>
 					<Route exact path="/account/:id" component={Transactions} />
+					<Route exact path="/create" component={User} />
 				</Switch>
 			</BrowserRouter>
 		</>

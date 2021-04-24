@@ -21,3 +21,17 @@ span {
 	flex-direction: column;
 	word-spacing: 30px;
 }
+
+.nav-bar {
+	display: flex;
+	justify-content: center;
+}
+
+li {
+	margin: 25px;
+	list-style-type: none;
+}
+
+.selected {
+	font-weight: bold;
+}

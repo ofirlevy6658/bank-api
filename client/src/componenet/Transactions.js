@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 
@@ -6,8 +6,11 @@ const Transactions = () => {
 	const [userData, setUserData] = useState([]);
 	const [userBankAccount, setUserBankAccount] = useState([]);
 	const [userLog, setUserLog] = useState([]);
-	const [deposit, setDeposit] = useState(0);
+	const [amount, setAmount] = useState(0);
 	const params = useParams();
+	const depositRef = useRef(null);
+	const witdrawRef = useRef(null);
+	const creditRef = useRef(null);
 	useEffect(() => {
 		const fetchData = async () => {
 			const userData = await axios.get(
@@ -18,15 +21,41 @@ const Transactions = () => {
 			setUserLog(userData.data[2]);
 		};
 		fetchData();
-	}, []);
+	}, [amount]);
+
 	const depositHandle = async () => {
-		const e = await axios.put(
-			`http://localhost:4000/api/deposit/${params.id}`,
-			{
-				amount: deposit,
-			}
-		);
-		console.log(userBankAccount.cash);
+		try {
+			await axios.put(`http://localhost:4000/api/deposit/${params.id}`, {
+				amount: amount,
+			});
+		} catch (e) {
+			console.log(e);
+		}
+		depositRef.current.value = "";
+
+		setAmount(0);
+	};
+	const witdrawHandle = async () => {
+		try {
+			await axios.put(`http://localhost:4000/api/withdraw/${params.id}`, {
+				amount: amount,
+			});
+		} catch (e) {
+			console.log(e);
+		}
+		witdrawRef.current.value = "";
+		setAmount(0);
+	};
+	const creditHandle = async () => {
+		try {
+			await axios.put(`http://localhost:4000/api/credit/${params.id}`, {
+				amount: amount,
+			});
+		} catch (e) {
+			console.log(e);
+		}
+		creditRef.current.value = "";
+		setAmount(0);
 	};
 
 	return (
@@ -43,15 +72,24 @@ const Transactions = () => {
 			<input
 				type="number"
 				min="0"
-				onChange={(e) => setDeposit(e.target.value)}
+				onChange={(e) => setAmount(e.target.value)}
+				ref={depositRef}
 			/>
 			<button onClick={depositHandle}>Deposit</button>
 			<input
 				type="number"
 				min="0"
-				onChange={(e) => setDeposit(e.target.value)}
+				onChange={(e) => setAmount(e.target.value)}
+				ref={witdrawRef}
 			/>
-			<button>Witdraw</button>
+			<button onClick={witdrawHandle}>Witdraw</button>
+			<input
+				type="number"
+				min="0"
+				onChange={(e) => setAmount(e.target.value)}
+				ref={creditRef}
+			/>
+			<button onClick={creditHandle}>add credit</button>
 		</>
 	);
 };
