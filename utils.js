@@ -42,7 +42,7 @@ async function deposit(id, { amount }) {
 		await Account.findOneAndUpdate({ ownerId: id }, { $inc: { cash: amount } });
 		await AccountLog.findOneAndUpdate(
 			{ ownerId: id },
-			{ $push: { log: `deposit ${amount}` } }
+			{ $push: { log: `deposit ${amount}$` } }
 		);
 	} catch (e) {
 		throw new Error("User not found");
@@ -59,7 +59,7 @@ async function updateCredit(id, { amount }) {
 		);
 		await AccountLog.findOneAndUpdate(
 			{ ownerId: id },
-			{ $push: { log: `credit increase by ${amount}` } }
+			{ $push: { log: `credit increase by ${amount}$` } }
 		);
 	} catch (e) {
 		throw new Error(e);
@@ -78,7 +78,7 @@ async function withdraw(id, { amount }) {
 			);
 			await AccountLog.findOneAndUpdate(
 				{ ownerId: id },
-				{ $push: { log: `withdraw ${amount}` } }
+				{ $push: { log: `withdraw ${amount}$` } }
 			);
 		} else {
 			throw new Error("Rejected not enough credit");

@@ -21,7 +21,7 @@ const Transactions = () => {
 			setUserLog(userData.data[2].log);
 		};
 		fetchData();
-	}, [amount]);
+	}, [amount, params.id]);
 
 	const depositHandle = async () => {
 		try {
@@ -57,8 +57,8 @@ const Transactions = () => {
 		creditRef.current.value = "";
 		setAmount(0);
 	};
-	const renderLog = userLog.map((log) => {
-		return <p>{log}</p>;
+	const renderLog = userLog.map((log, index) => {
+		return <p key={index}>{log}</p>;
 	});
 
 	return (

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { NavLink } from "react-router-dom";
 
 const Nav = () => {
@@ -9,6 +9,8 @@ const Nav = () => {
 					<NavLink activeClassName="selected" to="/">
 						Home
 					</NavLink>
+				</li>
+				<li>
 					<NavLink activeClassName="selected" to="/create">
 						create
 					</NavLink>
