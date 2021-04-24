@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
-import axios from "axios";
 import { useParams } from "react-router-dom";
+import api from "../API/api";
 
 const Transactions = () => {
 	const [userData, setUserData] = useState([]);
@@ -13,9 +13,7 @@ const Transactions = () => {
 	const creditRef = useRef(null);
 	useEffect(() => {
 		const fetchData = async () => {
-			const userData = await axios.get(
-				`http://localhost:4000/api/user/${params.id}`
-			);
+			const userData = await api.get(`user/${params.id}`);
 			setUserData(userData.data[0]);
 			setUserBankAccount(userData.data[1]);
 			setUserLog(userData.data[2].log);
@@ -25,7 +23,7 @@ const Transactions = () => {
 
 	const depositHandle = async () => {
 		try {
-			await axios.put(`http://localhost:4000/api/deposit/${params.id}`, {
+			await api.put(`/deposit/${params.id}`, {
 				amount: amount,
 			});
 		} catch (e) {
@@ -37,7 +35,7 @@ const Transactions = () => {
 	};
 	const witdrawHandle = async () => {
 		try {
-			await axios.put(`http://localhost:4000/api/withdraw/${params.id}`, {
+			await api.put(`/withdraw/${params.id}`, {
 				amount: amount,
 			});
 		} catch (e) {
@@ -48,7 +46,7 @@ const Transactions = () => {
 	};
 	const creditHandle = async () => {
 		try {
-			await axios.put(`http://localhost:4000/api/credit/${params.id}`, {
+			await api.put(`/credit/${params.id}`, {
 				amount: amount,
 			});
 		} catch (e) {

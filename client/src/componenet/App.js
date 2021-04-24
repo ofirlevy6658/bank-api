@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { BrowserRouter, Route, Switch, Link } from "react-router-dom";
 
 import Nav from "./Nav";
 import Transactions from "./Transactions";
 import User from "./User";
 import "./app.css";
+import api from "../API/api";
 
 const App = () => {
 	const [clients, setClients] = useState([]);
 	useEffect(() => {
 		const fetchData = async () => {
-			const usersData = await axios.get("http://localhost:4000/api/users");
+			const usersData = await api.get("/users");
 			setClients(usersData.data);
 		};
 		fetchData();
