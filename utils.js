@@ -76,6 +76,10 @@ async function withdraw(id, { amount }) {
 				{ ownerId: id },
 				{ $inc: { cash: -amount } }
 			);
+			await AccountLog.findOneAndUpdate(
+				{ ownerId: id },
+				{ $push: { log: `withdraw ${amount}` } }
+			);
 		} else {
 			throw new Error("Rejected not enough credit");
 		}

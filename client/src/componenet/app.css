@@ -35,3 +35,6 @@ li {
 .selected {
 	font-weight: bold;
 }
+p {
+	margin: 0;
+}

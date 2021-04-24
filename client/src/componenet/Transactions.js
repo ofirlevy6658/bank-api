@@ -18,7 +18,7 @@ const Transactions = () => {
 			);
 			setUserData(userData.data[0]);
 			setUserBankAccount(userData.data[1]);
-			setUserLog(userData.data[2]);
+			setUserLog(userData.data[2].log);
 		};
 		fetchData();
 	}, [amount]);
@@ -57,6 +57,9 @@ const Transactions = () => {
 		creditRef.current.value = "";
 		setAmount(0);
 	};
+	const renderLog = userLog.map((log) => {
+		return <p>{log}</p>;
+	});
 
 	return (
 		<>
@@ -90,6 +93,7 @@ const Transactions = () => {
 				ref={creditRef}
 			/>
 			<button onClick={creditHandle}>add credit</button>
+			<div>{renderLog}</div>
 		</>
 	);
 };
