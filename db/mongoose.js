@@ -1,6 +1,9 @@
 const mongoose = require("mongoose");
 
-mongoose.connect("mongodb://127.0.0.1:27017/bank-manager-api", {
-	useNewUrlParser: true,
-	useCreateIndex: true,
-});
+mongoose.connect(
+	"mongodb+srv://dbBank:6105935z@cluster0.u2wgr.mongodb.net/bank-manager-api?retryWrites=true&w=majority",
+	{
+		useNewUrlParser: true,
+		useCreateIndex: true,
+	}
+);
